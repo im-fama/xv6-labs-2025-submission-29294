@@ -61,5 +61,49 @@ void
 memdump(char *fmt, char *data)
 {
   // Your code here.
-
+for (int i = 0; fmt[i]; i++) {
+    char f = fmt[i];
+    switch (f) {
+    case 'i': { // 32-bit int
+      int *ip = (int *)data;
+      printf("%d\n", *ip);
+      data += 4;
+      break;
+    }
+    case 'p': { // 64-bit pointer
+      uint64 *pp = (uint64 *)data;
+      printf("%p\n",(void*)*pp);
+      data += 8;
+      break;
+    }
+    case 'h': { // 16-bit short
+      short *hp = (short *)data;
+      printf("%d\n", *hp);
+      data += 2;
+      break;
+    }
+    case 'c': { // 8-bit char
+      char *cp = (char *)data;
+      printf("%c\n", *cp);
+      data += 1;
+      break;
+    }
+    case 's': { // 64-bit pointer to C string
+      char **sp = (char **)data;
+      printf("%s\n", *sp);
+      data += 8;
+      break;
+    }
+    case 'S': { // null-terminated string (rest of data)
+      char *str = (char *)data;
+      printf("%s\n", str);
+      // consume all remaining data
+      while (*data) data++;
+      break;
+    }
+    default:
+      printf("unknown format: %c\n", f);
+      break;
+    }
+  }
 }
