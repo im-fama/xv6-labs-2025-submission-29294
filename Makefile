@@ -7,6 +7,9 @@
 
 K=kernel
 U=user
+ULINKERSCRIPT=user/user.ld
+print-%:
+	@echo '$*=$($*)'
 
 OBJS = \
   $K/entry.o \
@@ -140,6 +143,9 @@ $K/%.o: $K/%.c
 $K/%.o: $K/%.S
 	$(CC) -g -c -o $@ $<
 
+user/_find: user/find.o user/grep.o
+	$(LD) $(LDFLAGS) -T $(ULINKERSCRIPT) -o $@ $^ $(ULIB)
+
 tags: $(OBJS)
 	etags kernel/*.S kernel/*.c
 
@@ -195,9 +201,11 @@ UPROGS=\
 	$U/_logstress\
 	$U/_forphan\
 	$U/_dorphan\
-
-
-
+        $U/_sleep\
+        $U/_sixfive\
+	$U/_memdump\
+	$U/_find\
+	$U/_uptime\
 
 ifeq ($(LAB),syscall)
 UPROGS += \
@@ -208,6 +216,7 @@ endif
 ifeq ($(LAB),lock)
 UPROGS += \
 	$U/_stats
+
 endif
 
 ifeq ($(LAB),traps)
@@ -279,7 +288,7 @@ ifeq ($(LAB),util)
 endif
 
 
-fs.img: mkfs/mkfs README $(UEXTRA) $(UPROGS)
+fs.img: mkfs/mkfs README sixfive.txt $(UEXTRA) $(UPROGS)
 	mkfs/mkfs fs.img README $(UEXTRA) $(UPROGS)
 
 newfs.img: 
