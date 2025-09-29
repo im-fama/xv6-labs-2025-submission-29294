@@ -7,9 +7,6 @@
 
 K=kernel
 U=user
-ULINKERSCRIPT=user/user.ld
-print-%:
-	@echo '$*=$($*)'
 
 OBJS = \
   $K/entry.o \
@@ -143,9 +140,6 @@ $K/%.o: $K/%.c
 $K/%.o: $K/%.S
 	$(CC) -g -c -o $@ $<
 
-user/_find: user/find.o user/grep.o
-	$(LD) $(LDFLAGS) -T $(ULINKERSCRIPT) -o $@ $^ $(ULIB)
-
 tags: $(OBJS)
 	etags kernel/*.S kernel/*.c
 
@@ -190,9 +184,9 @@ UPROGS=\
 	$U/_kill\
 	$U/_ln\
 	$U/_ls\
+	$U/_sh\
 	$U/_mkdir\
 	$U/_rm\
-	$U/_sh\
 	$U/_stressfs\
 	$U/_usertests\
 	$U/_grind\
