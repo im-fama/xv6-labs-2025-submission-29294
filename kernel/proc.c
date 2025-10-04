@@ -253,6 +253,9 @@ growproc(int n)
 
 // Create a new process, copying the parent.
 // Sets up child kernel stack to return as if from fork() system call.
+
+// Create a new process, copying the parent.
+// Sets up child kernel stack to return as if from fork() system call.
 int
 kfork(void)
 {
@@ -279,6 +282,9 @@ kfork(void)
   // Cause fork to return 0 in the child.
   np->trapframe->a0 = 0;
 
+  // inherit syscall mask from parent (sandbox restriction)
+  np->syscall_mask = p->syscall_mask;
+
   // increment reference counts on open file descriptors.
   for(i = 0; i < NOFILE; i++)
     if(p->ofile[i])
@@ -298,6 +304,9 @@ kfork(void)
   acquire(&np->lock);
   np->state = RUNNABLE;
   release(&np->lock);
+
+  np->syscall_mask = p->syscall_mask;
+  safestrcpy(np->allowed_path, p->allowed_path, MAXPATH);
 
   return pid;
 }
