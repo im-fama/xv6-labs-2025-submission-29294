@@ -1,0 +1,24 @@
+1: The function that invoked syscall is usertrap(), which handles traps
+   from user space and transfers control into the kernel when a system
+   call is made.
+
+2: The value of p->trapframe->a7 corresponds to the system call number
+   passed by the user program. For example, if the value is 7, it
+   represents the SYS_exec system call.
+
+3: The processor was previously in user mode, as indicated by the sstatus
+   register (SPP=0). The trap moved execution into supervisor (kernel) mode.
+
+4: When replacing num = p->trapframe->a7; with num = *(int*)0;,
+   the kernel attempts to read from address 0, which is not mapped in the
+   kernel address space. This triggers a page fault panic (scause=0xd),
+   confirming the null address is invalid.
+
+5: The kernel panics at a load instruction (lw) from address 0 in
+   kernel/syscall.c. The value of num is stored in register a5,
+   which holds the faulty load result. The crash occurs because address 0
+   is not mapped in the kernel’s virtual memory, so dereferencing it
+   causes an invalid access. 
+
+7: The process running at the time of the panic is init, with pid = 1,
+   the very first user program started by xv6.
